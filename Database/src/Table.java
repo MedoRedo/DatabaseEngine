@@ -9,8 +9,9 @@ public class Table implements Serializable{
 	
 	Vector<String>pages;
 	String name;
-	String clusteringKeyColumn;
+	String clusteringKeyColumn; //clustering column name
 	Hashtable<String,String> htblColNameType;
+	
 	
 	public Table(String strTableName,
 			String strClusteringKeyColumn,
@@ -24,9 +25,11 @@ public class Table implements Serializable{
 	
 	public void insert(Vector<Object> tuple,int keyIndex,String keytype) {
 		Vector<Object> v = tuple;
+		//System.out.println(pages);
 		for(String curr:pages) 
 		{
 			Page currentPage = (Page)DBApp.deserialize(curr);
+			//System.out.println(currentPage.v);
 			try 
 			{
 				v = currentPage.insertSorted(v);
@@ -71,6 +74,8 @@ public class Table implements Serializable{
 			last.v.add(next);
 		}
 		last.v.remove(tupleIdx);
+		DBApp.serialize(last, pages.get(pageIdx));
+		
 	}
 	
 	public static void main(String[] args) {

@@ -165,9 +165,55 @@ public class DBApp implements java.io.Serializable{
 		
 		Table t = (Table)deserialize(strTableName);
 		t.insert(v, keyIndex, keytype);
+		serialize(t, strTableName);
 	}
+	
+	// updateTable notes:
+	// htblColNameValue holds the key and new value 
+	// htblColNameValue will not include clustering key as column name
+	// htblColNameValue entries are ANDED together public 
 	public void updateTable(String strTableName,String strClusteringKey,
-			Hashtable<String,Object> htblColNameValue)  throws DBAppException{
+			Hashtable<String,Object> htblColNameValue)  throws Exception{//ÈÔßá ãÄÞÊ
+		
+		Vector<String>colNames= new Vector<String>();
+		br=new BufferedReader(new FileReader("Meta-Data.csv"));
+		while(br.ready()) 
+		{
+			String[]row = br.readLine().split(",");
+			if(row[0].equals(strTableName))
+			{
+				colNames.add(row[1]);
+			}
+			
+		}
+		
+		Table table = (Table)deserialize(strTableName);
+		for(int k=table.pages.size()-1;k>=0;k--)
+		{
+			String curr = table.pages.get(k);
+			Page currentPage = (Page)deserialize(curr);
+			int keyIdx=currentPage.clusteringKeyIndex;
+			
+			for(int m=currentPage.v.size()-1;m>=0;m--)
+			{
+				Vector<Object> tuple = currentPage.v.get(m);
+				if(tuple.get(keyIdx).toString().equals(strClusteringKey))
+				{
+					for(int i=0;i<tuple.size();i++)
+					{
+						if(!htblColNameValue.containsKey(colNames.get(i)))
+						{
+							continue;
+						}
+						tuple.set(i,htblColNameValue.get(colNames.get(i)));
+					}
+					serialize(currentPage, curr);
+				}
+				
+			}
+			
+		}
+		serialize(table, strTableName);
 		
 	}
 	
@@ -190,11 +236,11 @@ public class DBApp implements java.io.Serializable{
 		}
 		
 		Table table = (Table)deserialize(strTableName);
-		for(int k=0;k<table.pages.size();k++)
+		for(int k=table.pages.size()-1;k>=0;k--)
 		{
 			String curr = table.pages.get(k);
 			Page currentPage = (Page)deserialize(curr);
-			for(int m=0;m<currentPage.v.size();m++)
+			for(int m=currentPage.v.size()-1;m>=0;m--)
 			{
 				Vector<Object> tuple = currentPage.v.get(m);
 				boolean match = true;
@@ -226,35 +272,20 @@ public class DBApp implements java.io.Serializable{
 			}
 			
 		}
+		serialize(table, strTableName);
 	}
 	
 	
 	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		String strTableName = "Student";
-		DBApp dbApp = new DBApp( );
-//		dbApp.init();
-//		Hashtable htblColNameType = new Hashtable( );
-//		htblColNameType.put("id", "java.lang.Integer");
-//		htblColNameType.put("name", "java.lang.String");
-//		htblColNameType.put("gpa", "java.lang.Double");
-//		dbApp.createTable( strTableName, "id", htblColNameType );
-//		Hashtable htblColNameValue = new Hashtable( );
-//		htblColNameValue.put("id", new Integer( 2343432 ));
-//		htblColNameValue.put("name", new String("Ahmed Noor" ) ); 
-//		htblColNameValue.put("gpa", new Double( 0.95 ) ); 
-//		dbApp.deleteFromTable( strTableName , htblColNameValue ); 
+		String strTableName = "Student"; 
+		DBApp dbApp = new DBApp( ); 
 		
 		Hashtable htblColNameValue = new Hashtable( );
 		htblColNameValue.put("id", new Integer( 2343432 ));
-		htblColNameValue.put("name", new String("Ahmed Noor" ) ); 
-		htblColNameValue.put("gpa", new Double( 0.95 ) ); 
-		dbApp.insertIntoTable( strTableName , htblColNameValue );
-		
-		Page p=(Page)deserialize("0Student");
-		serialize(p, "0Student");
+		dbApp.deleteFromTable( strTableName , htblColNameValue );
+		Page p = (Page)deserialize("0Student");
 		System.out.println(p.v);
-		
 	}
 }

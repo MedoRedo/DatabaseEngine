@@ -8,7 +8,7 @@ public class Page implements java.io.Serializable{
 	int clusteringKeyIndex;
 	String clusteringKeyType;
 	Vector<Vector<Object>> v;
-	static int N;
+	int N;
 	
 	public Page(String pageName,int clusteringKeyIndex,String clusteringKeyType) {
 		this.clusteringKeyIndex = clusteringKeyIndex;
@@ -19,6 +19,7 @@ public class Page implements java.io.Serializable{
 	}
 	
 	public Vector<Object> insertSorted(Vector<Object> tuple) throws Exception{
+		//System.out.println(v);
 		Object mykeyValue = tuple.get(clusteringKeyIndex);
 		boolean inserted = false;
 		Class keyClass = Class.forName(clusteringKeyType);
@@ -38,6 +39,7 @@ public class Page implements java.io.Serializable{
 		{
 			v.add(tuple);
 		}
+		//System.out.println(v);
 		if(v.size()>N)
 		{
 			Vector<Object> last = v.remove(v.size()-1);
