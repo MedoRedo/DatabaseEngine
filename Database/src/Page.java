@@ -10,9 +10,12 @@ public class Page implements java.io.Serializable{
 	Vector<Vector<Object>> v;
 	static int N;
 	
-	public Page(String pageName) {
+	public Page(String pageName,int clusteringKeyIndex,String clusteringKeyType) {
+		this.clusteringKeyIndex = clusteringKeyIndex;
+		this.clusteringKeyType = clusteringKeyType;
 		this.pageName=pageName;
 		v = new Vector<Vector<Object>>();
+		N=4;
 	}
 	
 	public Vector<Object> insertSorted(Vector<Object> tuple) throws Exception{
@@ -39,6 +42,16 @@ public class Page implements java.io.Serializable{
 		{
 			Vector<Object> last = v.remove(v.size()-1);
 			return last;
+		}
+		return null;
+	}
+	
+	
+	public Vector<Object> removeTupleAt(int index) {
+		// not last
+		if(v.size() == N)
+		{
+			return v.remove(index);
 		}
 		return null;
 	}

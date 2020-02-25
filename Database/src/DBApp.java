@@ -71,7 +71,7 @@ public class DBApp implements java.io.Serializable{
 			} 
 			catch (Exception e) 
 			{
-				System.err.println("Excption in create table");
+				e.printStackTrace();
 			}
 	}
 	
@@ -89,7 +89,7 @@ public class DBApp implements java.io.Serializable{
 		}
 		catch(Exception e)
 		{
-			System.out.println("Excption in ser");
+			e.printStackTrace();
 		}
 	}
 	
@@ -105,26 +105,156 @@ public class DBApp implements java.io.Serializable{
 		}
 		catch(Exception e)
 		{
-			System.out.println("Excption in deser");
+			e.printStackTrace();
+		//	System.out.println("Excption in deser");
 			return null;
 		}
 	}
 	
 	public void insertIntoTable(String strTableName,
 			 Hashtable<String,Object> htblColNameValue)
-			 throws DBAppException {
+			 throws Exception {
+		
+		boolean ok=true;
+		
+		//tuple
+		Vector<Object>v=new Vector<Object>();
+		int keyIndex=-1;String keytype = ""; 
+		br=new BufferedReader(new FileReader("Meta-Data.csv"));
+		while(br.ready()) 
+		{
+			String[]row = br.readLine().split(",");
+			if(row[3].equals("true"))
+			{
+				keyIndex = v.size();
+				keytype = row[2];
+			}
+			if(row[0].equals(strTableName)) {
+				String type=row[2];
+				Object value=htblColNameValue.getOrDefault(row[1], null);
+				if(value==null && row[3].equals("true")) {
+					ok=false;
+					break;
+				}
+				if(value==null) {
+					v.add(value);
+				}
+				else {
+					try {
+						Class cl=Class.forName(type);
+						
+						if(value.getClass()== cl) {
+							v.add(value);
+						}
+						else {
+							ok=false;
+							break;
+						}
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		if(!ok)
+		{
+			System.out.println("Invalid insertion");
+			return;
+		}
+		
+		Table t = (Table)deserialize(strTableName);
+		t.insert(v, keyIndex, keytype);
+	}
+	public void updateTable(String strTableName,String strClusteringKey,
+			Hashtable<String,Object> htblColNameValue)  throws DBAppException{
 		
 	}
+	
+	// deleteFromTable notes:
+	// htblColNameValue holds the key and value. This will be used in search
+	// to identify which rows/tuples to delete.
+	// htblColNameValue entries are ANDED together
+	public void deleteFromTable(String strTableName,
+			Hashtable<String,Object> htblColNameValue)throws Exception{// »‘ﬂ· „Êﬁ 
+		
+		Vector<String>colNames= new Vector<String>();
+		br=new BufferedReader(new FileReader("Meta-Data.csv"));
+		while(br.ready()) 
+		{
+			String[]row = br.readLine().split(",");
+			if(row[0].equals(strTableName))
+			{
+				colNames.add(row[1]);
+			}
+		}
+		
+		Table table = (Table)deserialize(strTableName);
+		for(int k=0;k<table.pages.size();k++)
+		{
+			String curr = table.pages.get(k);
+			Page currentPage = (Page)deserialize(curr);
+			for(int m=0;m<currentPage.v.size();m++)
+			{
+				Vector<Object> tuple = currentPage.v.get(m);
+				boolean match = true;
+				for(int i=0;i<tuple.size();i++)
+				{
+					if(!htblColNameValue.containsKey(colNames.get(i)))
+					{
+						continue;
+					}
+					Object val = htblColNameValue.get(colNames.get(i));
+					
+					if(val.getClass() != tuple.get(i).getClass())
+					{
+						match = false;
+						break;
+					}
+					
+					if(!val.equals(tuple.get(i)))
+					{
+						match = false;
+						break;
+					}
+				}
+				if(!match)
+				{
+					continue;
+				}
+				table.removeTuple(k, m);
+			}
+			
+		}
+	}
+	
+	
+	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		String strTableName = "Student";
 		DBApp dbApp = new DBApp( );
-		//dbApp.init();
-		Hashtable htblColNameType = new Hashtable( );
-		htblColNameType.put("id", "java.lang.Integer");
-		htblColNameType.put("name", "java.lang.String");
-		htblColNameType.put("gpa", "java.lang.double");
-		dbApp.createTable( strTableName, "id", htblColNameType );
+//		dbApp.init();
+//		Hashtable htblColNameType = new Hashtable( );
+//		htblColNameType.put("id", "java.lang.Integer");
+//		htblColNameType.put("name", "java.lang.String");
+//		htblColNameType.put("gpa", "java.lang.Double");
+//		dbApp.createTable( strTableName, "id", htblColNameType );
+//		Hashtable htblColNameValue = new Hashtable( );
+//		htblColNameValue.put("id", new Integer( 2343432 ));
+//		htblColNameValue.put("name", new String("Ahmed Noor" ) ); 
+//		htblColNameValue.put("gpa", new Double( 0.95 ) ); 
+//		dbApp.deleteFromTable( strTableName , htblColNameValue ); 
+		
+		Hashtable htblColNameValue = new Hashtable( );
+		htblColNameValue.put("id", new Integer( 2343432 ));
+		htblColNameValue.put("name", new String("Ahmed Noor" ) ); 
+		htblColNameValue.put("gpa", new Double( 0.95 ) ); 
+		dbApp.insertIntoTable( strTableName , htblColNameValue );
+		
+		Page p=(Page)deserialize("0Student");
+		serialize(p, "0Student");
+		System.out.println(p.v);
+		
 	}
-
 }
