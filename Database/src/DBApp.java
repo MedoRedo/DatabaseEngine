@@ -19,7 +19,7 @@ public class DBApp implements java.io.Serializable{
 	
 	public void init() {
 		try {
-			pw=new PrintWriter("Meta-Data.csv");
+			pw=new PrintWriter("metadata.csv");
 			pw.println("Table Name, Column Name, Column Type, ClusteringKey, Indexed");
 			pw.flush();
 		} catch (Exception e) {
@@ -52,13 +52,13 @@ public class DBApp implements java.io.Serializable{
 			
 			try 
 			{
-				br=new BufferedReader(new FileReader("Meta-Data.csv"));
+				br=new BufferedReader(new FileReader("metadata.csv"));
 				StringBuilder sb=new StringBuilder();
 				while(br.ready()) 
 				{
 					sb.append(br.readLine());sb.append("\n");
 				}
-				pw=new PrintWriter("Meta-Data.csv"); 
+				pw=new PrintWriter("metadata.csv"); 
 				pw.print(sb);
 				for(Entry<String, String>e:htblColNameType.entrySet()) 
 				{
@@ -74,7 +74,25 @@ public class DBApp implements java.io.Serializable{
 				e.printStackTrace();
 			}
 	}
-	
+	public static Comparable parse(String keytype,String strClusteringKey) {
+		String types[] = { "java.lang.Integer", "java.lang.String",
+				"java.lang.Double", "java.lang.Boolean", "java.util.Date" ,"java.awt.Polygon"};
+		if(keytype.equals(types[0])) {
+			return Integer.parseInt(strClusteringKey);
+		}else if(keytype.equals(types[1])) {
+			return strClusteringKey;
+		}else if(keytype.equals(types[2])) {
+			return Double.parseDouble(strClusteringKey);
+		}else if(keytype.equals(types[3])) {
+			return Boolean.parseBoolean(strClusteringKey);
+		}else if(keytype.equals(types[4])) {
+			return strClusteringKey;
+		}else {
+			// Intended to be modified
+			return strClusteringKey;
+		}
+	}
+
 	
 	
 	
@@ -120,16 +138,16 @@ public class DBApp implements java.io.Serializable{
 		//tuple
 		Vector<Object>v=new Vector<Object>();
 		int keyIndex=-1;String keytype = ""; 
-		br=new BufferedReader(new FileReader("Meta-Data.csv"));
+		br=new BufferedReader(new FileReader("metadata.csv"));
 		while(br.ready()) 
 		{
 			String[]row = br.readLine().split(",");
-			if(row[3].equals("true"))
-			{
-				keyIndex = v.size();
-				keytype = row[2];
-			}
 			if(row[0].equals(strTableName)) {
+				if(row[3].equals("true"))
+				{
+					keyIndex = v.size();
+					keytype = row[2];
+				}
 				String type=row[2];
 				Object value=htblColNameValue.getOrDefault(row[1], null);
 				if(value==null && row[3].equals("true")) {
@@ -174,45 +192,27 @@ public class DBApp implements java.io.Serializable{
 	// htblColNameValue entries are ANDED together public 
 	public void updateTable(String strTableName,String strClusteringKey,
 			Hashtable<String,Object> htblColNameValue)  throws Exception{//»‘ﬂ· „ƒﬁ 
-		
+		int keyIndex=-1;String keytype = ""; 
 		Vector<String>colNames= new Vector<String>();
-		br=new BufferedReader(new FileReader("Meta-Data.csv"));
+		br=new BufferedReader(new FileReader("metadata.csv"));
 		while(br.ready()) 
 		{
 			String[]row = br.readLine().split(",");
 			if(row[0].equals(strTableName))
 			{
+				if(row[3].equals("true"))
+				{
+					keyIndex = colNames.size();
+					keytype = row[2];
+				}
+
 				colNames.add(row[1]);
 			}
 			
 		}
 		
 		Table table = (Table)deserialize(strTableName);
-		for(int k=table.pages.size()-1;k>=0;k--)
-		{
-			String curr = table.pages.get(k);
-			Page currentPage = (Page)deserialize(curr);
-			int keyIdx=currentPage.clusteringKeyIndex;
-			
-			for(int m=currentPage.v.size()-1;m>=0;m--)
-			{
-				Vector<Object> tuple = currentPage.v.get(m);
-				if(tuple.get(keyIdx).toString().equals(strClusteringKey))
-				{
-					for(int i=0;i<tuple.size();i++)
-					{
-						if(!htblColNameValue.containsKey(colNames.get(i)))
-						{
-							continue;
-						}
-						tuple.set(i,htblColNameValue.get(colNames.get(i)));
-					}
-					serialize(currentPage, curr);
-				}
-				
-			}
-			
-		}
+		table.update(htblColNameValue, strClusteringKey, keyIndex, keytype);
 		serialize(table, strTableName);
 		
 	}
@@ -225,7 +225,7 @@ public class DBApp implements java.io.Serializable{
 			Hashtable<String,Object> htblColNameValue)throws Exception{// »‘ﬂ· „Êﬁ 
 		
 		Vector<String>colNames= new Vector<String>();
-		br=new BufferedReader(new FileReader("Meta-Data.csv"));
+		br=new BufferedReader(new FileReader("metadata.csv"));
 		while(br.ready()) 
 		{
 			String[]row = br.readLine().split(",");
