@@ -52,6 +52,7 @@ public class Table implements Serializable{
 				e.printStackTrace();
 			}
 		}
+		
 	}
 	public void insert(Vector<Object> tuple,int keyIndex,String keytype) {
 		Vector<Object> v = tuple;

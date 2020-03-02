@@ -70,11 +70,11 @@ public class Page implements java.io.Serializable{
 			{
 				if(x == 0)
 					ans = mid;
-				hi = mid-1;
+				low = mid+1;
 			}
 			else
 			{
-				low = mid+1;
+				hi = mid-1;
 			}
 		}
 		Vector<String>colNames= new Vector<String>();
@@ -88,7 +88,6 @@ public class Page implements java.io.Serializable{
 			}
 			
 		}
-
 		if(ans == -1) return false; // Maybe an execption
 		for(int i = ans;i<v.size();i++) {
 			Vector<Object> curr = v.get(i);

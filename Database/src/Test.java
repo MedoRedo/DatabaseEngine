@@ -9,22 +9,17 @@ public class Test {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		String strTableName = "Student";
-		dbApp = new DBApp( );
-//		dbApp.init();
-//		Hashtable htblColNameType = new Hashtable( );
-//		htblColNameType.put("id", "java.lang.Integer");
-//		htblColNameType.put("name", "java.lang.String");
-//		htblColNameType.put("gpa", "java.lang.Double");
-//		dbApp.createTable( strTableName, "id", htblColNameType );
-//		insertTest(strTableName);
+		dbApp = new DBApp();
+		dbApp.init();
+		Hashtable htblColNameType = new Hashtable( );
+		htblColNameType.put("id", "java.lang.Integer");
+		htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("gpa", "java.lang.Double");
+		dbApp.createTable( strTableName, "id", htblColNameType );
+		insertTest(strTableName);
 		viewTable(strTableName);
-		System.out.println("---------------------------");
-		delete(strTableName);
-
-//		updateTest(strTableName);
+		updateTest(strTableName);
 		viewTable(strTableName);
-		System.out.println("---------------------------");
-
 //		p = (Page) dbApp.deserialize("2Student");
 //		System.out.println(p.v);
 //		p = (Page) dbApp.deserialize("0Student");
@@ -37,17 +32,19 @@ public class Test {
 	static void viewTable(String strTableName) {
 		Table table = (Table) dbApp.deserialize(strTableName);
 		Vector<String> pages = table.pages;
+		System.out.println("---------------------------");
 		for(String str:pages) {
 			Page page = (Page) dbApp.deserialize(str);
 			for(Vector<Object>tuple:page.v) {
 				System.out.println(tuple);
 			}
 		}
+		System.out.println("---------------------------");
 	}
 	static void updateTest(String strTableName) throws Exception{
 		Hashtable htblColNameValue = new Hashtable( );
 		htblColNameValue.put("gpa", new Double( 0.001 ) );
-		dbApp.updateTable(strTableName, "78452", htblColNameValue);;
+		dbApp.updateTable(strTableName, "23498", htblColNameValue);;
 		htblColNameValue.clear( );
 		
 	}
