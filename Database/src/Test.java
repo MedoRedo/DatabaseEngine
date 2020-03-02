@@ -1,5 +1,6 @@
 import java.awt.Polygon;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import exception.DBAppException;
 
@@ -16,18 +17,32 @@ public class Test {
 //		htblColNameType.put("gpa", "java.lang.Double");
 //		dbApp.createTable( strTableName, "id", htblColNameType );
 //		insertTest(strTableName);
-		updateTest(strTableName);
-		Page p = (Page) dbApp.deserialize("0Student");
-		System.out.println(p.v);
+		viewTable(strTableName);
+		System.out.println("---------------------------");
+		delete(strTableName);
+
+//		updateTest(strTableName);
+		viewTable(strTableName);
+		System.out.println("---------------------------");
+
 //		p = (Page) dbApp.deserialize("2Student");
 //		System.out.println(p.v);
-//		delete(strTableName);
 //		p = (Page) dbApp.deserialize("0Student");
 //		System.out.println(p.v);
 //		p = (Page) dbApp.deserialize("2Student");
 //		System.out.println(p.v);
 		
 		
+	}
+	static void viewTable(String strTableName) {
+		Table table = (Table) dbApp.deserialize(strTableName);
+		Vector<String> pages = table.pages;
+		for(String str:pages) {
+			Page page = (Page) dbApp.deserialize(str);
+			for(Vector<Object>tuple:page.v) {
+				System.out.println(tuple);
+			}
+		}
 	}
 	static void updateTest(String strTableName) throws Exception{
 		Hashtable htblColNameValue = new Hashtable( );
