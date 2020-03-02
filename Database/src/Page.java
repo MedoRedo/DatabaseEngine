@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Vector;
 
 public class Page implements java.io.Serializable{
@@ -18,9 +19,19 @@ public class Page implements java.io.Serializable{
 		this.clusteringKeyType = clusteringKeyType;
 		this.pageName=pageName;
 		v = new Vector<Vector<Object>>();
-		N=4;
+		N = getMaxRowsCountinPage();
 	}
-	
+	public static int getMaxRowsCountinPage(){
+		try {
+			FileReader reader = new FileReader("DBApp.properties");
+			Properties properties = new Properties();
+			properties.load(reader);
+			return Integer.parseInt(properties.getProperty("MaximumRowsCountinPage"));			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return 200;
+	}
 	public Vector<Object> insertSorted(Vector<Object> tuple) throws Exception{
 		//System.out.println(v);
 		Comparable mykeyValue = (Comparable) tuple.get(clusteringKeyIndex);

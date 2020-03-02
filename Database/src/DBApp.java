@@ -3,34 +3,45 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+<<<<<<< HEAD
+import java.io.FileWriter;
+=======
+>>>>>>> e3d3a7a5843aabbf4222371ac725c03709d2a1ae
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.Vector;
 
 import exception.DBAppException;
 
+
+// I DO NOT UNDERSTAND THE WARING 
 public class DBApp implements java.io.Serializable{
 	
 	static PrintWriter pw;
 	static BufferedReader br;
 	
 	public void init() {
-		try {
+		try 
+		{
 			pw=new PrintWriter("metadata.csv");
 			pw.println("Table Name, Column Name, Column Type, ClusteringKey, Indexed");
 			pw.flush();
-		} catch (Exception e) {
-			// TODO: handle exception
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			System.out.println("Cannot do init()");
 		}
-		
 	}
 	public void createTable(String strTableName,
 			String strClusteringKeyColumn,
-			Hashtable<String,
-			String> htblColNameType )throws DBAppException{
+			Hashtable<String,String> htblColNameType )
+		    throws DBAppException{
 			
 			boolean alreadyExist = false;
 			
@@ -38,10 +49,15 @@ public class DBApp implements java.io.Serializable{
 			{
 				FileInputStream fileInput = new FileInputStream(strTableName+".class");
 				alreadyExist = true;
+				fileInput.close();
 			}
 			catch(FileNotFoundException e)
 			{
 				alreadyExist = false;
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
 			}
 		
 			if(alreadyExist)
@@ -274,18 +290,22 @@ public class DBApp implements java.io.Serializable{
 		}
 		serialize(table, strTableName);
 	}
-	
+	public static void writeProperties() throws Exception {
+		Properties properties = new Properties();
+		properties.setProperty("MaximumRowsCountinPage", "200");
+		properties.setProperty("NodeSize", "15");
+		properties.store(new FileWriter("DBApp.properties"),"DataBase Engine Properties");
+	}
 	
 	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
+		writeProperties();
+=======
 		String strTableName = "Student"; 
 		DBApp dbApp = new DBApp( ); 
-		
-		Hashtable htblColNameValue = new Hashtable( );
-		htblColNameValue.put("id", new Integer( 2343432 ));
-		dbApp.deleteFromTable( strTableName , htblColNameValue );
-		Page p = (Page)deserialize("0Student");
-		System.out.println(p.v);
+		dbApp.init();
+>>>>>>> e3d3a7a5843aabbf4222371ac725c03709d2a1ae
 	}
 }
