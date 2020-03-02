@@ -3,10 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-<<<<<<< HEAD
 import java.io.FileWriter;
-=======
->>>>>>> e3d3a7a5843aabbf4222371ac725c03709d2a1ae
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -300,12 +297,6 @@ public class DBApp implements java.io.Serializable{
 	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-<<<<<<< HEAD
 		writeProperties();
-=======
-		String strTableName = "Student"; 
-		DBApp dbApp = new DBApp( ); 
-		dbApp.init();
->>>>>>> e3d3a7a5843aabbf4222371ac725c03709d2a1ae
 	}
 }
