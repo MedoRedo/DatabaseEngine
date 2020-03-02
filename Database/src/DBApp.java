@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -25,15 +26,18 @@ public class DBApp implements java.io.Serializable{
 			pw=new PrintWriter("metadata.csv");
 			pw.println("Table Name, Column Name, Column Type, ClusteringKey, Indexed");
 			pw.flush();
-		} catch (Exception e) {
-			// TODO: handle exception
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			System.out.println("Cannot do init()");
 		}
 		
 	}
 	public void createTable(String strTableName,
 			String strClusteringKeyColumn,
-			Hashtable<String,
-			String> htblColNameType )throws DBAppException{
+			Hashtable<String,String> htblColNameType )
+		    throws DBAppException{
 			
 			boolean alreadyExist = false;
 			
@@ -41,10 +45,15 @@ public class DBApp implements java.io.Serializable{
 			{
 				FileInputStream fileInput = new FileInputStream(strTableName+".class");
 				alreadyExist = true;
+				fileInput.close();
 			}
 			catch(FileNotFoundException e)
 			{
 				alreadyExist = false;
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
 			}
 		
 			if(alreadyExist)
