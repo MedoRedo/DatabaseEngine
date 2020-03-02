@@ -15,7 +15,7 @@ public class Table implements Serializable{
 	String name;
 	String clusteringKeyColumn; //clustering column name
 	Hashtable<String,String> htblColNameType;
-	
+	int pageNumber;
 	
 	public Table(String strTableName,
 			String strClusteringKeyColumn,
@@ -99,7 +99,8 @@ public class Table implements Serializable{
 		}
 		if(v==null)
 			return;
-		String pageName =pages.size()+""+name;
+		String pageName = pageNumber+""+name;
+		pageNumber++;
 		Page newPage = new Page(pageName,keyIndex,keytype);
 		pages.add(pageName);
 		try 
