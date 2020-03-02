@@ -12,13 +12,16 @@ import java.util.Vector;
 
 import exception.DBAppException;
 
+
+// I DO NOT UNDERSTAND THE WARING 
 public class DBApp implements java.io.Serializable{
 	
 	static PrintWriter pw;
 	static BufferedReader br;
 	
 	public void init() {
-		try {
+		try 
+		{
 			pw=new PrintWriter("metadata.csv");
 			pw.println("Table Name, Column Name, Column Type, ClusteringKey, Indexed");
 			pw.flush();
@@ -281,11 +284,6 @@ public class DBApp implements java.io.Serializable{
 		// TODO Auto-generated method stub
 		String strTableName = "Student"; 
 		DBApp dbApp = new DBApp( ); 
-		
-		Hashtable htblColNameValue = new Hashtable( );
-		htblColNameValue.put("id", new Integer( 2343432 ));
-		dbApp.deleteFromTable( strTableName , htblColNameValue );
-		Page p = (Page)deserialize("0Student");
-		System.out.println(p.v);
+		dbApp.init();
 	}
 }
