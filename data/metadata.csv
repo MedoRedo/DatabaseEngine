@@ -1,0 +1,4 @@
+Table Name,Column Name,Column Type,ClusteringKey,Indexed
+String,gpa,java.lang.Double,false,true
+String,name,java.lang.String,false,false
+String,id,java.lang.String,true,true
